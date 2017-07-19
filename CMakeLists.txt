@@ -6,6 +6,17 @@ project(YUV C CXX)
 set(MODULE_NAME "yuv")
 set(MODULE_PREFIX "LIBYUV")
 
+if(WIN32)
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /W3")
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_CRT_SECURE_NO_WARNINGS")
+	set(variables CMAKE_C_FLAGS CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_RELEASE)
+	foreach(variable ${variables})
+		if(${variable} MATCHES "/MD") # force MSVC static runtime
+			string(REGEX REPLACE "/MD" "/MT" ${variable} "${${variable}}")
+		endif()
+	endforeach()
+endif()
+
 set(${MODULE_PREFIX}_HEADERS "")
 
 set(${MODULE_PREFIX}_SOURCES
