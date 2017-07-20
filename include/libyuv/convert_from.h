@@ -115,7 +115,7 @@ int I420ToUYVY(const uint8* src_y,
                int dst_stride_frame,
                int width,
                int height);
-
+#if 0
 LIBYUV_API
 int I420ToARGB(const uint8* src_y,
                int src_stride_y,
@@ -127,7 +127,7 @@ int I420ToARGB(const uint8* src_y,
                int dst_stride_argb,
                int width,
                int height);
-
+#endif
 LIBYUV_API
 int I420ToBGRA(const uint8* src_y,
                int src_stride_y,
@@ -139,7 +139,7 @@ int I420ToBGRA(const uint8* src_y,
                int dst_stride_argb,
                int width,
                int height);
-
+#if 0
 LIBYUV_API
 int I420ToABGR(const uint8* src_y,
                int src_stride_y,
@@ -151,7 +151,7 @@ int I420ToABGR(const uint8* src_y,
                int dst_stride_argb,
                int width,
                int height);
-
+#endif
 LIBYUV_API
 int I420ToRGBA(const uint8* src_y,
                int src_stride_y,

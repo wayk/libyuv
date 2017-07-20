@@ -20,6 +20,7 @@ extern "C" {
 
 // Copy ARGB to ARGB.
 #define ARGBToARGB ARGBCopy
+#if 0
 LIBYUV_API
 int ARGBCopy(const uint8* src_argb,
              int src_stride_argb,
@@ -27,6 +28,7 @@ int ARGBCopy(const uint8* src_argb,
              int dst_stride_argb,
              int width,
              int height);
+#endif
 
 // Convert ARGB To BGRA.
 LIBYUV_API
@@ -139,7 +141,7 @@ int ARGBToI422(const uint8* src_argb,
                int dst_stride_v,
                int width,
                int height);
-
+#if 0
 // Convert ARGB To I420. (also in convert.h)
 LIBYUV_API
 int ARGBToI420(const uint8* src_argb,
@@ -152,7 +154,7 @@ int ARGBToI420(const uint8* src_argb,
                int dst_stride_v,
                int width,
                int height);
-
+#endif
 // Convert ARGB to J420. (JPeg full range I420).
 LIBYUV_API
 int ARGBToJ420(const uint8* src_argb,
@@ -227,7 +229,7 @@ int ARGBToNV21(const uint8* src_argb,
                int dst_stride_vu,
                int width,
                int height);
-
+#if 0
 // Convert ARGB To NV21.
 LIBYUV_API
 int ARGBToNV21(const uint8* src_argb,
@@ -238,7 +240,7 @@ int ARGBToNV21(const uint8* src_argb,
                int dst_stride_vu,
                int width,
                int height);
-
+#endif
 // Convert ARGB To YUY2.
 LIBYUV_API
 int ARGBToYUY2(const uint8* src_argb,

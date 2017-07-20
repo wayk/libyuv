@@ -450,7 +450,7 @@ int ARGBQuantize(uint8* dst_argb,
                  int y,
                  int width,
                  int height);
-
+#if 0
 // Copy ARGB to ARGB.
 LIBYUV_API
 int ARGBCopy(const uint8* src_argb,
@@ -459,7 +459,7 @@ int ARGBCopy(const uint8* src_argb,
              int dst_stride_argb,
              int width,
              int height);
-
+#endif
 // Copy Alpha channel of ARGB to alpha of ARGB.
 LIBYUV_API
 int ARGBCopyAlpha(const uint8* src_argb,
@@ -734,7 +734,7 @@ int I420Interpolate(const uint8* src0_y,
     (defined(_M_IX86) || defined(__x86_64__) || defined(__i386__))
 #define HAS_ARGBAFFINEROW_SSE2
 #endif
-
+#if 0
 // Row function for copying pixels from a source with a slope to a row
 // of destination. Useful for scaling, rotation, mirror, texture mapping.
 LIBYUV_API
@@ -749,7 +749,7 @@ void ARGBAffineRow_SSE2(const uint8* src_argb,
                         uint8* dst_argb,
                         const float* uv_dudv,
                         int width);
-
+#endif
 // Shuffle ARGB channel order.  e.g. BGRA to ARGB.
 // shuffler is 16 bytes and must be aligned.
 LIBYUV_API
