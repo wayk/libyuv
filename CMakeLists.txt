@@ -6,7 +6,7 @@ project(YUV C CXX)
 set(MODULE_NAME "yuv")
 set(MODULE_PREFIX "LIBYUV")
 
-if(WIN32)
+if(MSVC)
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /W3")
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_CRT_SECURE_NO_WARNINGS")
 	set(variables CMAKE_C_FLAGS CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_RELEASE)
@@ -17,14 +17,31 @@ if(WIN32)
 	endforeach()
 endif()
 
-set(${MODULE_PREFIX}_HEADERS "")
+set(${MODULE_PREFIX}_HEADERS
+	include/libyuv.h
+	include/libyuv/basic_types.h
+	include/libyuv/compare.h
+	include/libyuv/convert.h
+	include/libyuv/convert_argb.h
+	include/libyuv/convert_from.h
+	include/libyuv/convert_from_argb.h
+	include/libyuv/cpu_id.h
+	include/libyuv/mjpeg_decoder.h
+	include/libyuv/planar_functions.h
+	include/libyuv/rotate.h
+	include/libyuv/rotate_argb.h
+	include/libyuv/rotate_row.h
+	include/libyuv/row.h
+	include/libyuv/scale.h
+	include/libyuv/scale_argb.h
+	include/libyuv/scale_row.h
+	include/libyuv/version.h
+	include/libyuv/video_common.h)
 
 set(${MODULE_PREFIX}_SOURCES
 	source/compare.cc
 	source/compare_common.cc
 	source/compare_gcc.cc
-	source/compare_neon.cc
-	source/compare_neon64.cc
 	source/compare_win.cc
 	source/convert.cc
 	source/convert_argb.cc
@@ -41,16 +58,12 @@ set(${MODULE_PREFIX}_SOURCES
 	source/rotate_dspr2.cc
 	source/rotate_gcc.cc
 	source/rotate_msa.cc
-	source/rotate_neon.cc
-	source/rotate_neon64.cc
 	source/rotate_win.cc
 	source/row_any.cc
 	source/row_common.cc
 	source/row_dspr2.cc
 	source/row_gcc.cc
 	source/row_msa.cc
-	source/row_neon.cc
-	source/row_neon64.cc
 	source/row_win.cc
 	source/scale.cc
 	source/scale_any.cc
@@ -59,10 +72,18 @@ set(${MODULE_PREFIX}_SOURCES
 	source/scale_dspr2.cc
 	source/scale_gcc.cc
 	source/scale_msa.cc
-	source/scale_neon.cc
-	source/scale_neon64.cc
 	source/scale_win.cc
 	source/video_common.cc)
+
+set(${MODULE_PREFIX}_NEON_SOURCES
+	source/compare_neon.cc
+	source/compare_neon64.cc
+	source/rotate_neon.cc
+	source/rotate_neon64.cc
+	source/row_neon.cc
+	source/row_neon64.cc
+	source/scale_neon.cc
+	source/scale_neon64.cc)
 
 set_source_files_properties(${${MODULE_PREFIX}_SOURCES} PROPERTIES LANGUAGE C)
 
