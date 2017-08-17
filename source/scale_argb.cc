@@ -27,6 +27,9 @@ static __inline int Abs(int v) {
   return v >= 0 ? v : -v;
 }
 
+static uvec8 kShuffleMaskABGRToARGB = {2u,  1u, 0u, 3u,  6u,  5u,  4u,  7u,
+                                       10u, 9u, 8u, 11u, 14u, 13u, 12u, 15u};
+
 // ScaleARGB ARGB, 1/2
 // This is an optimized version for scaling down a ARGB to 1/2 of
 // its original size.
@@ -269,6 +272,8 @@ static void ScaleARGBBilinearDown(int src_width,
   void (*ScaleARGBFilterCols)(uint8 * dst_argb, const uint8* src_argb,
                               int dst_width, int x, int dx) =
       (src_width >= 32768) ? ScaleARGBFilterCols64_C : ScaleARGBFilterCols_C;
+  void (*ARGBShuffleRow)(const uint8* src_bgra, uint8* dst_argb,
+                              const uint8* shuffler, int width) = ARGBShuffleRow_C;
   int64 xlast = x + (int64)(dst_width - 1) * dx;
   int64 xl = (dx >= 0) ? x : xlast;
   int64 xr = (dx >= 0) ? xlast : x;
@@ -336,6 +341,46 @@ static void ScaleARGBBilinearDown(int src_width,
     }
   }
 #endif
+#if defined(HAS_ARGBSHUFFLEROW_SSE2)
+  if (TestCpuFlag(kCpuHasSSE2)) {
+    ARGBShuffleRow = ARGBShuffleRow_Any_SSE2;
+    if (IS_ALIGNED(dst_width, 4)) {
+      ARGBShuffleRow = ARGBShuffleRow_SSE2;
+    }
+  }
+#endif
+#if defined(HAS_ARGBSHUFFLEROW_SSSE3)
+  if (TestCpuFlag(kCpuHasSSSE3)) {
+    ARGBShuffleRow = ARGBShuffleRow_Any_SSSE3;
+    if (IS_ALIGNED(dst_width, 8)) {
+      ARGBShuffleRow = ARGBShuffleRow_SSSE3;
+    }
+  }
+#endif
+#if defined(HAS_ARGBSHUFFLEROW_AVX2)
+  if (TestCpuFlag(kCpuHasAVX2)) {
+    ARGBShuffleRow = ARGBShuffleRow_Any_AVX2;
+    if (IS_ALIGNED(dst_width, 16)) {
+      ARGBShuffleRow = ARGBShuffleRow_AVX2;
+    }
+  }
+#endif
+#if defined(HAS_ARGBSHUFFLEROW_NEON)
+  if (TestCpuFlag(kCpuHasNEON)) {
+    ARGBShuffleRow = ARGBShuffleRow_Any_NEON;
+    if (IS_ALIGNED(dst_width, 4)) {
+      ARGBShuffleRow = ARGBShuffleRow_NEON;
+    }
+  }
+#endif
+#if defined(HAS_ARGBSHUFFLEROW_MSA)
+  if (TestCpuFlag(kCpuHasMSA)) {
+    ARGBShuffleRow = ARGBShuffleRow_Any_MSA;
+    if (IS_ALIGNED(dst_width, 8)) {
+      ARGBShuffleRow = ARGBShuffleRow_MSA;
+    }
+  }
+#endif
   // TODO(fbarchard): Consider not allocating row buffer for kFilterLinear.
   // Allocate a row of ARGB.
   {
@@ -355,6 +400,7 @@ static void ScaleARGBBilinearDown(int src_width,
         InterpolateRow(row, src, src_stride, clip_src_width, yf);
         ScaleARGBFilterCols(dst_argb, row, dst_width, x, dx);
       }
+      ARGBShuffleRow(dst_argb, dst_argb, (uint8*) &kShuffleMaskABGRToARGB, dst_width);
       dst_argb += dst_stride;
       y += dy;
       if (y > max_y) {
@@ -386,6 +432,8 @@ static void ScaleARGBBilinearUp(int src_width,
   void (*ScaleARGBFilterCols)(uint8 * dst_argb, const uint8* src_argb,
                               int dst_width, int x, int dx) =
       filtering ? ScaleARGBFilterCols_C : ScaleARGBCols_C;
+  void (*ARGBShuffleRow)(const uint8* src_bgra, uint8* dst_argb,
+                              const uint8* shuffler, int width) = ARGBShuffleRow_C;
   const int max_y = (src_height - 1) << 16;
 #if defined(HAS_INTERPOLATEROW_SSSE3)
   if (TestCpuFlag(kCpuHasSSSE3)) {
@@ -463,6 +511,46 @@ static void ScaleARGBBilinearUp(int src_width,
     }
 #endif
   }
+#if defined(HAS_ARGBSHUFFLEROW_SSE2)
+  if (TestCpuFlag(kCpuHasSSE2)) {
+    ARGBShuffleRow = ARGBShuffleRow_Any_SSE2;
+    if (IS_ALIGNED(dst_width, 4)) {
+      ARGBShuffleRow = ARGBShuffleRow_SSE2;
+    }
+  }
+#endif
+#if defined(HAS_ARGBSHUFFLEROW_SSSE3)
+  if (TestCpuFlag(kCpuHasSSSE3)) {
+    ARGBShuffleRow = ARGBShuffleRow_Any_SSSE3;
+    if (IS_ALIGNED(dst_width, 8)) {
+      ARGBShuffleRow = ARGBShuffleRow_SSSE3;
+    }
+  }
+#endif
+#if defined(HAS_ARGBSHUFFLEROW_AVX2)
+  if (TestCpuFlag(kCpuHasAVX2)) {
+    ARGBShuffleRow = ARGBShuffleRow_Any_AVX2;
+    if (IS_ALIGNED(dst_width, 16)) {
+      ARGBShuffleRow = ARGBShuffleRow_AVX2;
+    }
+  }
+#endif
+#if defined(HAS_ARGBSHUFFLEROW_NEON)
+  if (TestCpuFlag(kCpuHasNEON)) {
+    ARGBShuffleRow = ARGBShuffleRow_Any_NEON;
+    if (IS_ALIGNED(dst_width, 4)) {
+      ARGBShuffleRow = ARGBShuffleRow_NEON;
+    }
+  }
+#endif
+#if defined(HAS_ARGBSHUFFLEROW_MSA)
+  if (TestCpuFlag(kCpuHasMSA)) {
+    ARGBShuffleRow = ARGBShuffleRow_Any_MSA;
+    if (IS_ALIGNED(dst_width, 8)) {
+      ARGBShuffleRow = ARGBShuffleRow_MSA;
+    }
+  }
+#endif
 
   if (y > max_y) {
     y = max_y;
@@ -509,6 +597,7 @@ static void ScaleARGBBilinearUp(int src_width,
         int yf = (y >> 8) & 255;
         InterpolateRow(dst_argb, rowptr, rowstride, dst_width * 4, yf);
       }
+      ARGBShuffleRow(dst_argb, dst_argb, (uint8*) &kShuffleMaskABGRToARGB, dst_width);
       dst_argb += dst_stride;
       y += dy;
     }
