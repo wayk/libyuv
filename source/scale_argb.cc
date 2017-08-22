@@ -274,7 +274,7 @@ static void ScaleARGBBilinearDown(int src_width,
       (src_width >= 32768) ? ScaleARGBFilterCols64_C : ScaleARGBFilterCols_C;
   void (*ARGBShuffleRow)(const uint8* src_bgra, uint8* dst_argb,
                               const uint8* shuffler, int width) = ARGBShuffleRow_C;
-  int needs_shuffling = 1;
+  int needs_shuffling = 0;
   int64 xlast = x + (int64)(dst_width - 1) * dx;
   int64 xl = (dx >= 0) ? x : xlast;
   int64 xr = (dx >= 0) ? xlast : x;
@@ -382,9 +382,6 @@ static void ScaleARGBBilinearDown(int src_width,
     }
   }
 #endif
-#ifdef _WIN32
-  needs_shuffling = 0;
-#endif
   // TODO(fbarchard): Consider not allocating row buffer for kFilterLinear.
   // Allocate a row of ARGB.
   {
@@ -439,7 +436,7 @@ static void ScaleARGBBilinearUp(int src_width,
       filtering ? ScaleARGBFilterCols_C : ScaleARGBCols_C;
   void (*ARGBShuffleRow)(const uint8* src_bgra, uint8* dst_argb,
                               const uint8* shuffler, int width) = ARGBShuffleRow_C;
-  int needs_shuffling = 1;
+  int needs_shuffling = 0;
   const int max_y = (src_height - 1) << 16;
 #if defined(HAS_INTERPOLATEROW_SSSE3)
   if (TestCpuFlag(kCpuHasSSSE3)) {
@@ -556,9 +553,6 @@ static void ScaleARGBBilinearUp(int src_width,
       ARGBShuffleRow = ARGBShuffleRow_MSA;
     }
   }
-#endif
-#ifdef _WIN32
-  needs_shuffling = 0;
 #endif
 
   if (y > max_y) {
